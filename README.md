@@ -30,28 +30,7 @@ A full-stack, enterprise-grade **Employee Leave Management System** built with *
 
 ##  Application Architecture
 
-```
-                       Browser (HTML5 / CSS3 / Vanilla JS)
-                                     │
-                    fetch() [JSON REST APIs / CORS Enabled]
-                                     ▼
-        ┌───────────────────────────────────────────────────────────┐
-        │                 Spring Boot Application                   │
-        │                                                           │
-        │  AuthController   EmployeeController   LeaveController   │
-        │        │                   │                  │           │
-        │        ▼                   ▼                  ▼           │
-        │                   EmployeeService       LeaveService      │
-        │                            │                  │           │
-        │                            ▼                  ▼           │
-        │                   EmployeeRepository   LeaveRepository   │
-        │                                    │                      │
-        │                             Spring Data JPA               │
-        └────────────────────────────────────┼──────────────────────┘
-                                             │
-                                       MySQL Database
-                                (leave_management_db)
-```
+![Architecture](screenshots/architecture.png)
 
 ---
 
