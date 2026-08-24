@@ -1,11 +1,5 @@
 # Employee Leave Management System
 
-[![Java](https://img.shields.io/badge/Java-17%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2.5-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![JUnit 5](https://img.shields.io/badge/JUnit-5-25A162?style=for-the-badge&logo=junit5&logoColor=white)](https://junit.org/junit5/)
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge)]()
-
 A full-stack, enterprise-grade **Employee Leave Management System** built with **Java 17, Spring Boot 3, Spring Data JPA, MySQL, and HTML5/CSS3/JavaScript web interface**.
 
 ---
