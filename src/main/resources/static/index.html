@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Employee Leave Management System - Complete full-stack portal with separated Admin and Employee authentication and white modern theme.">
+    <title>LeaveHub | Enterprise Leave Management Portal</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light-theme">
+
+    <!-- ========================================================= -->
+    <!--  SCREEN 1: AUTHENTICATION / LOGIN SCREEN (Email & Password)-->
+    <!-- ========================================================= -->
+    <div id="view-auth" class="auth-screen">
+        <div class="auth-wrapper">
+            <!-- Brand Card -->
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </div>
+                <h1>Leave<span>Hub</span></h1>
+                <p>Enterprise Leave Management Portal</p>
+            </div>
+
+            <!-- Login Card -->
+            <div class="auth-card">
+                <div class="auth-card-title">
+                    <h3>Sign In to Your Account</h3>
+                    <p>Enter your credentials to access your designated workspace</p>
+                </div>
+
+                <!-- Email & Password Form -->
+                <form id="auth-form" class="auth-form" novalidate>
+                    <div class="form-group">
+                        <label for="auth-email">Work Email <span class="required">*</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-envelope"></i>
+                            <input type="email" id="auth-email" placeholder="Enter your Email" required autocomplete="email">
+                        </div>
+                        <span class="field-error" id="auth-email-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="auth-password">Password <span class="required">*</span></label>
+                        <div class="input-icon-wrap password-wrap">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" id="auth-password" placeholder="Enter your password" required autocomplete="current-password">
+                            <button type="button" class="btn-toggle-pwd" id="btn-toggle-password" title="Toggle password visibility">
+                                <i class="fa-solid fa-eye" id="toggle-pwd-icon"></i>
+                            </button>
+                        </div>
+                        <span class="field-error" id="auth-password-error"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-submit-auth">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <span>Sign In</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!--  SCREEN 2: ADMIN PORTAL (Separated UI for Admins)         -->
+    <!-- ========================================================= -->
+    <div id="view-admin-portal" class="portal-screen" style="display: none;">
+        <div class="app-layout">
+            <!-- Admin Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="logo-icon logo-admin">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h2>Leave<span>Hub</span></h2>
+                        <span class="sub-label admin-label">Admin Portal</span>
+                    </div>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <button class="nav-item active" data-portal="admin" data-tab="admin-leaves-tab">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Leave Approvals</span>
+                        <span class="badge badge-warning" id="admin-pending-badge">0</span>
+                    </button>
+                    <button class="nav-item" data-portal="admin" data-tab="admin-employees-tab">
+                        <i class="fa-solid fa-users"></i>
+                        <span>Employee Directory</span>
+                    </button>
+                    <button class="nav-item" data-portal="admin" data-tab="admin-analytics-tab">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Visual Insights & KPIs</span>
+                    </button>
+                </nav>
+
+                <div class="sidebar-footer">
+                    <button class="btn btn-logout btn-block" id="btn-admin-logout">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span>Sign Out</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Admin Main Content -->
+            <main class="main-content">
+                <!-- Topbar -->
+                <header class="topbar">
+                    <div class="page-title-group">
+                        <h1 id="admin-page-heading">Leave Requests Management</h1>
+                        <p id="admin-page-subheading">Review, approve, or reject employee leave applications</p>
+                    </div>
+                    <div class="topbar-actions">
+                        <button class="btn btn-secondary" id="btn-admin-refresh" title="Refresh all records">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                            <span>Refresh</span>
+                        </button>
+                        <button class="btn btn-primary" id="btn-open-admin-leave-modal">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Create Leave</span>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Tab: Admin Leaves Table -->
+                <section id="admin-leaves-tab" class="tab-panel active">
+                    <!-- Admin Metrics (Only for Leave Approvals) -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon icon-blue">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Total Staff</span>
+                                <h3 class="stat-value" id="admin-stat-total-emp">0</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon icon-purple">
+                                <i class="fa-solid fa-file-lines"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Total Leave Requests</span>
+                                <h3 class="stat-value" id="admin-stat-total-leaves">0</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card stat-card-highlight">
+                            <div class="stat-icon icon-amber">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Awaiting Your Approval</span>
+                                <h3 class="stat-value" id="admin-stat-pending-leaves">0</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon icon-green">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Approved Requests</span>
+                                <h3 class="stat-value" id="admin-stat-approved-leaves">0</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-card">
+                        <div class="panel-header">
+                            <div class="filters-wrap">
+                                <div class="search-box">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    <input type="text" id="admin-leave-search" placeholder="Search by employee, department or reason...">
+                                </div>
+                                <div class="filter-group">
+                                    <label for="admin-status-filter">Status:</label>
+                                    <select id="admin-status-filter">
+                                        <option value="ALL">All Statuses</option>
+                                        <option value="PENDING">Pending (Action Required)</option>
+                                        <option value="APPROVED">Approved</option>
+                                        <option value="REJECTED">Rejected</option>
+                                        <option value="CANCELLED">Cancelled</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="admin-type-filter">Type:</label>
+                                    <select id="admin-type-filter">
+                                        <option value="ALL">All Types</option>
+                                        <option value="CL">Casual Leave (CL)</option>
+                                        <option value="SL">Sick Leave (SL)</option>
+                                        <option value="EL">Earned Leave (EL)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Admin Table with Approve / Reject / Cancel actions -->
+                        <div class="table-responsive">
+                            <table class="data-table" id="admin-leaves-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Employee</th>
+                                        <th>Department</th>
+                                        <th>Type</th>
+                                        <th>Duration</th>
+                                        <th>Days</th>
+                                        <th>Reason</th>
+                                        <th>Status</th>
+                                        <th>Admin Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-leaves-table-body">
+                                    <tr>
+                                        <td colspan="9" class="loading-cell">
+                                            <div class="spinner"></div> Loading leave requests...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tab: Admin Employees Management (Company Directory) -->
+                <section id="admin-employees-tab" class="tab-panel">
+                    <div class="panel-card">
+                        <div class="panel-header">
+                            <div>
+                                <h3>Company Directory (10 Employees)</h3>
+                                <p class="panel-subtitle">Overview of all registered organizational staff and roles</p>
+                            </div>
+                            <div class="search-box" style="max-width: 320px;">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="admin-emp-search" placeholder="Search by name, email, department...">
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Role</th>
+                                        <th>Email Address</th>
+                                        <th>Department</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-employees-table-body">
+                                    <tr><td colspan="5" class="loading-cell">Loading directory...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tab: Admin Visual Insights & KPIs (Native Expand / Collapse) -->
+                <section id="admin-analytics-tab" class="tab-panel">
+                    <div class="analytics-container">
+                        <div class="visual-insights-grid">
+                            <!-- Visual Insight 1 -->
+                            <details class="visual-insight-card">
+                                <summary class="insight-summary">
+                                    <div class="insight-header-left">
+                                        <div class="insight-tag tag-amber"><i class="fa-solid fa-fire-flame-curved"></i> High Utilization</div>
+                                        <h4>Employees with &gt; 5 Leave Days</h4>
+                                    </div>
+                                    <div class="insight-header-right">
+                                        <i class="fa-solid fa-chevron-down toggle-chevron"></i>
+                                    </div>
+                                </summary>
+                                <div class="insight-content">
+                                    <p class="insight-desc">Staff members who have taken more than 5 cumulative leave days.</p>
+                                    <div class="insight-body" id="admin-result-q1">
+                                        <div class="empty-state-sm">Loading utilization data...</div>
+                                    </div>
+                                </div>
+                            </details>
+
+                            <!-- Visual Insight 2 -->
+                            <details class="visual-insight-card">
+                                <summary class="insight-summary">
+                                    <div class="insight-header-left">
+                                        <div class="insight-tag tag-blue"><i class="fa-solid fa-chart-simple"></i> Consumption</div>
+                                        <h4>Staff Leave Usage Distribution</h4>
+                                    </div>
+                                    <div class="insight-header-right">
+                                        <i class="fa-solid fa-chevron-down toggle-chevron"></i>
+                                    </div>
+                                </summary>
+                                <div class="insight-content">
+                                    <p class="insight-desc">Cumulative days taken and total applications per employee.</p>
+                                    <div class="insight-body" id="admin-result-q2">
+                                        <div class="empty-state-sm">Loading usage data...</div>
+                                    </div>
+                                </div>
+                            </details>
+
+                            <!-- Visual Insight 3 -->
+                            <details class="visual-insight-card">
+                                <summary class="insight-summary">
+                                    <div class="insight-header-left">
+                                        <div class="insight-tag tag-purple"><i class="fa-solid fa-clock"></i> Action Queue</div>
+                                        <h4>Pending Approvals Priority Queue</h4>
+                                    </div>
+                                    <div class="insight-header-right">
+                                        <i class="fa-solid fa-chevron-down toggle-chevron"></i>
+                                    </div>
+                                </summary>
+                                <div class="insight-content">
+                                    <p class="insight-desc">Leave applications currently awaiting administrative decision.</p>
+                                    <div class="insight-body" id="admin-result-q3">
+                                        <div class="empty-state-sm">Loading pending queue...</div>
+                                    </div>
+                                </div>
+                            </details>
+
+                            <!-- Visual Insight 4 -->
+                            <details class="visual-insight-card">
+                                <summary class="insight-summary">
+                                    <div class="insight-header-left">
+                                        <div class="insight-tag tag-green"><i class="fa-solid fa-award"></i> 100% Attendance</div>
+                                        <h4>Zero-Leave Attendance Champions</h4>
+                                    </div>
+                                    <div class="insight-header-right">
+                                        <i class="fa-solid fa-chevron-down toggle-chevron"></i>
+                                    </div>
+                                </summary>
+                                <div class="insight-content">
+                                    <p class="insight-desc">Staff members with zero leave requests recorded to date.</p>
+                                    <div class="insight-body" id="admin-result-q4">
+                                        <div class="empty-state-sm">Loading attendance champions...</div>
+                                    </div>
+                                </div>
+                            </details>
+
+                            <!-- Visual Insight 5 -->
+                            <details class="visual-insight-card visual-card-full">
+                                <summary class="insight-summary">
+                                    <div class="insight-header-left">
+                                        <div class="insight-tag tag-indigo"><i class="fa-solid fa-layer-group"></i> Category Share</div>
+                                        <h4>Most Frequently Used Leave Category & Trend</h4>
+                                    </div>
+                                    <div class="insight-header-right">
+                                        <i class="fa-solid fa-chevron-down toggle-chevron"></i>
+                                    </div>
+                                </summary>
+                                <div class="insight-content">
+                                    <p class="insight-desc">Distribution of Casual Leave (CL), Sick Leave (SL), and Earned Leave (EL).</p>
+                                    <div class="insight-body" id="admin-result-q5">
+                                        <div class="empty-state-sm">Loading category distribution...</div>
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!--  SCREEN 3: EMPLOYEE PORTAL (Separated UI for Employees)   -->
+    <!-- ========================================================= -->
+    <div id="view-employee-portal" class="portal-screen" style="display: none;">
+        <div class="employee-layout">
+            <!-- Employee Topbar Header -->
+            <header class="emp-header">
+                <div class="emp-header-left">
+                    <div class="logo-icon logo-employee">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <h2>Leave<span>Hub</span></h2>
+                        <span class="sub-label">Employee Portal</span>
+                    </div>
+                </div>
+
+                <div class="emp-header-user">
+                    <div class="user-avatar avatar-employee">👤</div>
+                    <div class="user-meta">
+                        <div class="user-name" id="emp-user-name">Alice Johnson</div>
+                        <div class="user-dept" id="emp-user-dept">Engineering Department</div>
+                    </div>
+                    <button class="btn btn-logout" id="btn-emp-logout" title="Sign out of employee portal">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span>Sign Out</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Employee Portal Main Body -->
+            <div class="emp-main-container">
+                <!-- Welcome & Stats Banner -->
+                <section class="emp-welcome-banner">
+                    <div class="welcome-text">
+                        <h3>Hello, <span id="emp-welcome-name">Alice</span> 👋</h3>
+                        <p>Track your leave allowances, check application statuses, or send a new leave request.</p>
+                    </div>
+                    <button class="btn btn-primary btn-lg" id="btn-emp-open-leave-modal">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Send Leave Request</span>
+                    </button>
+                </section>
+
+                <!-- Employee Stats Grid -->
+                <section class="stats-grid emp-stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon icon-purple"><i class="fa-solid fa-calendar-days"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Leave Taken</span>
+                            <h3 class="stat-value" id="emp-stat-days-taken">0 Days</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon icon-amber"><i class="fa-solid fa-clock"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Pending Approval</span>
+                            <h3 class="stat-value" id="emp-stat-pending">0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon icon-green"><i class="fa-solid fa-circle-check"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Approved Leaves</span>
+                            <h3 class="stat-value" id="emp-stat-approved">0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon icon-blue"><i class="fa-solid fa-plane-departure"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Applications</span>
+                            <h3 class="stat-value" id="emp-stat-total-apps">0</h3>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- My Leave History Table Card -->
+                <section class="panel-card">
+                    <div class="panel-header">
+                        <div>
+                            <h3>My Leave History & Status</h3>
+                            <p class="panel-subtitle">Review real-time statuses and cancel pending or approved requests</p>
+                        </div>
+                        <button class="btn btn-secondary" id="btn-emp-refresh">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                            <span>Refresh</span>
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table" id="emp-leaves-table">
+                            <thead>
+                                <tr>
+                                    <th>Req ID</th>
+                                    <th>Leave Type</th>
+                                    <th>Duration</th>
+                                    <th>Days</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="emp-leaves-table-body">
+                                <tr><td colspan="7" class="loading-cell">Loading your requests...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!--  MODAL: SEND LEAVE REQUEST                                -->
+    <!-- ========================================================= -->
+    <div class="modal-overlay" id="leave-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <i class="fa-solid fa-paper-plane modal-icon"></i>
+                    <h3>Send Leave Application</h3>
+                </div>
+                <button class="modal-close" id="btn-close-leave-modal">&times;</button>
+            </div>
+            <form id="leave-form" class="app-form" novalidate>
+                <!-- Locked identity for Employee mode / Select for Admin mode -->
+                <div class="form-group" id="leave-emp-select-wrap">
+                    <label for="leave-emp-id">Employee <span class="required">*</span></label>
+                    <select id="leave-emp-id" required>
+                        <option value="">Select Employee...</option>
+                    </select>
+                    <span class="field-error" id="leave-emp-error"></span>
+                </div>
+
+                <div class="sender-pill" id="leave-emp-locked-pill" style="display: none;">
+                    <i class="fa-solid fa-user-check"></i>
+                    <span>Submitting for: <strong id="locked-emp-name">Alice Johnson</strong></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="leave-type">Leave Type <span class="required">*</span></label>
+                    <select id="leave-type" required>
+                        <option value="">Select Type...</option>
+                        <option value="CL">Casual Leave (CL)</option>
+                        <option value="SL">Sick Leave (SL)</option>
+                        <option value="EL">Earned Leave (EL)</option>
+                    </select>
+                    <span class="field-error" id="leave-type-error"></span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-half">
+                        <label for="leave-start-date">Start Date <span class="required">*</span></label>
+                        <input type="date" id="leave-start-date" required>
+                        <span class="field-error" id="leave-start-error"></span>
+                    </div>
+                    <div class="form-group col-half">
+                        <label for="leave-end-date">End Date <span class="required">*</span></label>
+                        <input type="date" id="leave-end-date" required>
+                        <span class="field-error" id="leave-end-error"></span>
+                    </div>
+                </div>
+
+                <!-- Auto-calculation box -->
+                <div class="calculation-banner">
+                    <div class="calc-label">
+                        <i class="fa-solid fa-calculator"></i>
+                        <span>Auto-Calculated Days:</span>
+                    </div>
+                    <div class="calc-value" id="calc-days-display">0 Days</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="leave-reason">Reason for Leave</label>
+                    <textarea id="leave-reason" rows="3" placeholder="Brief reason for your leave request..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="btn-cancel-leave-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-leave">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Submit Request</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!--  MODAL: ADD EMPLOYEE (Admin Only)                         -->
+    <!-- ========================================================= -->
+    <div class="modal-overlay" id="employee-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <i class="fa-solid fa-user-plus modal-icon"></i>
+                    <h3>Add New Employee</h3>
+                </div>
+                <button class="modal-close" id="btn-close-emp-modal">&times;</button>
+            </div>
+            <form id="modal-employee-form" class="app-form" novalidate>
+                <div class="form-group">
+                    <label for="modal-emp-name">Full Name <span class="required">*</span></label>
+                    <input type="text" id="modal-emp-name" placeholder="e.g. Marcus Vance" required>
+                    <span class="field-error" id="modal-emp-name-error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="modal-emp-email">Email Address <span class="required">*</span></label>
+                    <input type="email" id="modal-emp-email" placeholder="e.g. marcus.vance@example.com" required>
+                    <span class="field-error" id="modal-emp-email-error"></span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-half">
+                        <label for="modal-emp-dept">Department <span class="required">*</span></label>
+                        <select id="modal-emp-dept" required>
+                            <option value="">Select Department...</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="Human Resources">Human Resources</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Product">Product</option>
+                            <option value="Operations">Operations</option>
+                            <option value="Sales">Sales</option>
+                        </select>
+                        <span class="field-error" id="modal-emp-dept-error"></span>
+                    </div>
+                    <div class="form-group col-half">
+                        <label for="modal-emp-role">Role <span class="required">*</span></label>
+                        <select id="modal-emp-role" required>
+                            <option value="EMPLOYEE" selected>Employee</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                        <span class="field-error" id="modal-emp-role-error"></span>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="btn-cancel-emp-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Save Account</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
