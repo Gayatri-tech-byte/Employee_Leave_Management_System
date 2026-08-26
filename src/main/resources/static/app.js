@@ -732,7 +732,17 @@ function renderEmployeeLeavesTable() {
     }
 
     elements.empLeavesTableBody.innerHTML = myLeaves.map(l => {
-        const canCancel = l.status === 'PENDING' || l.status === 'APPROVED';
+        const isPending = l.status === 'PENDING';
+        const isApproved = l.status === 'APPROVED';
+
+        let actionHtml = '';
+        if (isPending) {
+            actionHtml = `<button class="btn btn-sm btn-logout" onclick="employeeCancelLeave(${l.id})" title="Cancel this leave request"><i class="fa-solid fa-ban"></i> Cancel</button>`;
+        } else if (isApproved) {
+            actionHtml = `<button class="btn btn-sm btn-neutral" disabled style="opacity: 0.45; cursor: not-allowed;" title="Approved leaves cannot be cancelled"><i class="fa-solid fa-ban"></i> Cancel</button>`;
+        } else {
+            actionHtml = `<span style="font-size: 11.5px; color: var(--text-muted);">Resolved</span>`;
+        }
 
         return `
             <tr>
@@ -742,18 +752,19 @@ function renderEmployeeLeavesTable() {
                 <td><span class="days-pill">${l.leaveDays} Day${l.leaveDays > 1 ? 's' : ''}</span></td>
                 <td><span style="color: var(--text-secondary); font-size: 12.5px;">${escapeHtml(l.reason || 'None provided')}</span></td>
                 <td><span class="status-pill status-${l.status}">${l.status}</span></td>
-                <td>
-                    ${canCancel 
-                        ? `<button class="btn btn-sm btn-logout" onclick="employeeCancelLeave(${l.id})" title="Cancel this leave request"><i class="fa-solid fa-ban"></i> Cancel</button>` 
-                        : `<span style="font-size: 11.5px; color: var(--text-muted);">No action</span>`
-                    }
-                </td>
+                <td>${actionHtml}</td>
             </tr>
         `;
     }).join('');
 }
 
 async function employeeCancelLeave(leaveId) {
+    const targetLeave = state.leaves.find(l => l.id === leaveId);
+    if (targetLeave && targetLeave.status === 'APPROVED') {
+        showToast('Approved leave applications cannot be cancelled.', 'error');
+        return;
+    }
+
     if (!confirm('Are you sure you want to cancel this leave application?')) return;
 
     try {

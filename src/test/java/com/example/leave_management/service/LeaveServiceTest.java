@@ -150,14 +150,28 @@ class LeaveServiceTest {
     }
 
     @Test
-    @DisplayName("Scenario 7: Cancel succeeds on PENDING or APPROVED leave")
+    @DisplayName("Scenario 7: Cancel succeeds on PENDING leave")
     void testCancelLeave_Success() {
-        leaveEntity.setStatus(LeaveStatus.APPROVED);
+        leaveEntity.setStatus(LeaveStatus.PENDING);
         when(leaveRepo.findById(10L)).thenReturn(Optional.of(leaveEntity));
         when(leaveRepo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         LeaveResponse response = leaveService.cancelLeave(10L);
 
         assertEquals(LeaveStatus.CANCELLED, response.getStatus());
+    }
+
+    @Test
+    @DisplayName("Scenario 8 (Business Rule): Approved leave CANNOT be cancelled")
+    void testCancelLeave_AlreadyApproved_ThrowsBadRequest() {
+        leaveEntity.setStatus(LeaveStatus.APPROVED);
+        when(leaveRepo.findById(10L)).thenReturn(Optional.of(leaveEntity));
+
+        BadRequestException ex = assertThrows(BadRequestException.class, () ->
+                leaveService.cancelLeave(10L)
+        );
+
+        assertTrue(ex.getMessage().contains("Cannot cancel an already APPROVED leave"));
+        verify(leaveRepo, never()).save(any());
     }
 }

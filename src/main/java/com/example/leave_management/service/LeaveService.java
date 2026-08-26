@@ -132,6 +132,12 @@ public class LeaveService {
     public LeaveResponse cancelLeave(Long id) {
         com.example.leave_management.entity.LeaveRequest leave = findLeaveOrThrow(id);
 
+        // Business rule: APPROVED leave cannot be cancelled
+        if (leave.getStatus() == LeaveStatus.APPROVED) {
+            throw new BadRequestException(
+                    "Cannot cancel an already APPROVED leave request. Only PENDING leaves can be cancelled.");
+        }
+
         // Business rule: REJECTED leave cannot be cancelled
         if (leave.getStatus() == LeaveStatus.REJECTED) {
             throw new BadRequestException(
