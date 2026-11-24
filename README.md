@@ -197,22 +197,6 @@ Run the tests with:
 mvn test
 ```
 
-## My Contributions
-
-My work on this repository includes:
-
-- Updated the Spring Boot version to 3.4.13.
-- Configured the project to use Java 24.
-- Replaced the hardcoded database password with the `DB_PASSWORD` environment variable.
-- Updated `.gitignore` to exclude environment files and log files.
-- Built and verified the project using Maven.
-
-## Source Acknowledgement
-
-This project is based on an existing Employee Leave Management System originally published by [prudhvi209](https://github.com/prudhvi209/Employee_Leave_Management).
-
-This repository is maintained separately, and the changes listed above describe my contributions. The original source is acknowledged to preserve attribution.
-
 ---
 
 **Repository:** [Employee_Leave_Management_System](https://github.com/Gayatri-tech-byte/Employee_Leave_Management_System)
